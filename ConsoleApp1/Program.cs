@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConsoleApp1.Services;
 using MySql.Data.MySqlClient;
 
 namespace OOP_DB
@@ -24,7 +25,20 @@ namespace OOP_DB
             //}
             Console.WriteLine("Kérem az adatbázis nevét: ");
             string dbName = Console.ReadLine();
-            Connect conn = new Connect(dbName);
+
+            ISqlStatement dataBase = new LIbrary();
+
+
+            
+
+
+
+            foreach (var item in dataBase.GetALlData(dbName))
+            {
+                var books = item.GetType().GetProperties();
+                Console.WriteLine($"{books[0].Name}={books[0].GetValue(item)},{books[1].Name}={books[1].GetValue(item)}");
+            }
+
         }
     }
 }
