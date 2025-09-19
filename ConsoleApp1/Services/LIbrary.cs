@@ -1,10 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using OOP_DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace ConsoleApp1.Services
 {
@@ -12,7 +14,30 @@ namespace ConsoleApp1.Services
     {
         public object AddNewItem(object newRecord)
         {
-            throw new NotImplementedException();
+            Connect conn = new Connect("library");
+
+            conn.Connnection.Open();
+
+            string sql = "INSERT INTO `books`(`title`, `author`, `releaseDate`) VALUES(@title, @author, @releasDate)";
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connnection);
+
+            cmd.ExecuteNonQuery();
+
+            var record = newRecord.GetType().GetProperties();
+
+            cmd.Parameters.AddWithValue("@title", record[0].GetValue(newRecord));
+            cmd.Parameters.AddWithValue("@author", record[1].GetValue(newRecord));
+            cmd.Parameters.AddWithValue("@releaseDate", record[2].GetValue(newRecord));
+
+            conn.Connnection.Close();
+
+            var result = new
+            {
+                message = "sikeres felvétel",
+                result = newRecord
+            };
+            return result;
         }
 
         public object DeleteItem(int id)
