@@ -10,6 +10,16 @@ namespace ConsoleApp1.Services
 {
     internal class LIbrary : ISqlStatement
     {
+        public object AddNewItem(object newRecord)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object DeleteItem(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<object> GetALlData(string dbName)
         {
             List<object> books = new List<object>();
@@ -32,6 +42,38 @@ namespace ConsoleApp1.Services
             }
             conn.Connnection.Close();
             return books;
+        }
+
+        public object GetById(int id)
+        {
+            Connect conn = new Connect("library");
+            conn.Connnection.Open();
+
+            string sql = $"SELECT * FROM 'books' WHERE id = @id ";
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connnection);
+
+            cmd.Parameters.AddWithValue("id", id);
+
+            MySqlDataReader dr = cmd.ExecuteReader();
+
+            dr .Read();
+
+            var record = new
+            {
+                id = dr.GetInt32("id"),
+                title = dr.GetString("title"),
+                author = dr.GetString("author"),
+                releaseDate = dr.GetString("releaseDate")
+            };
+
+            conn.Connnection.Close();
+            return record;
+        }
+
+        public object UpateIte(int modifiedItem)
+        {
+            throw new NotImplementedException();
         }
     }
 }
