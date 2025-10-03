@@ -1,104 +1,150 @@
-﻿using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
-using OOP_DB;
-using System;
+using MySql.Data.MySqlClient;
+using OOP_D;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Reflection.Metadata.BlobBuilder;
 
-namespace ConsoleApp1.Services
+namespace OOPAdatbazis.Services
 {
-    internal class LIbrary : ISqlStatement
+    internal class Library : ISqlStatements
     {
         public object AddNewItem(object newRecord)
         {
             Connect conn = new Connect("library");
 
-            conn.Connnection.Open();
+            conn.Connection.Open();
 
-            string sql = "INSERT INTO `books`(`title`, `author`, `releaseDate`) VALUES(@title, @author, @releasDate)";
+            string sql = "INSERT INTO `books`(`title`, `author`, `releaseDate`) VALUES (@title,@author,@releaseDate)";
 
-            MySqlCommand cmd = new MySqlCommand(sql, conn.Connnection);
-
-            cmd.ExecuteNonQuery();
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
 
             var record = newRecord.GetType().GetProperties();
-
             cmd.Parameters.AddWithValue("@title", record[0].GetValue(newRecord));
             cmd.Parameters.AddWithValue("@author", record[1].GetValue(newRecord));
             cmd.Parameters.AddWithValue("@releaseDate", record[2].GetValue(newRecord));
 
-            conn.Connnection.Close();
+            cmd.ExecuteNonQuery();
+
+            conn.Connection.Close();
 
             var result = new
             {
-                message = "sikeres felvétel",
+                message = "Sikeres felvétel.",
                 result = newRecord
             };
+
             return result;
         }
 
         public object DeleteItem(int id)
         {
-            throw new NotImplementedException();
+            Connect conn = new Connect("library");
+
+            conn.Connection.Open();
+
+            string sql = "DELETE FROM `books` WHERE id = @id";
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+
+            cmd.Parameters.AddWithValue("@id", id);
+
+            cmd.ExecuteNonQuery();
+
+            conn.Connection.Close();
+
+            var result = new
+            {
+                message = "Sikeres törlés.",
+
+            };
+
+            return result;
         }
 
-        public List<object> GetALlData(string dbName)
+        public List<object> GetAllData(string dbName)
         {
-            List<object> books = new List<object>();
             Connect conn = new Connect(dbName);
-            conn.Connnection.Open();
-            string sql = "Select *From 'books'";
-            MySqlCommand cmd = new MySqlCommand(sql, conn.Connnection);
-            MySqlDataReader dr = cmd.ExecuteReader();   
-            dr .Read();
+
+            List<object> books = new List<object>();
+
+            conn.Connection.Open();
+
+            string sql = "SELECT * FROM `books` ";
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+
+            MySqlDataReader dr = cmd.ExecuteReader();
+
+            dr.Read();
+
             while (dr.Read())
             {
                 var book = new
                 {
-                    id = dr.GetInt32("id"),
-                    title = dr.GetString("title"),
-                    author = dr.GetString ("author"),
-                    releaseDate = dr.GetString("releaseDate")
+                    id = dr.GetBodyDefinition(dr.GetName(0)),
+                    title = dr.GetBodyDefinition(dr.GetName(1)),
+                    author = dr.GetBodyDefinition(dr.GetName(2)),
+                    releaseDate = dr.GetBodyDefinition(dr.GetName(3))
                 };
+
                 books.Add(book);
             }
-            conn.Connnection.Close();
+
+            conn.Connection.Close();
+
             return books;
         }
 
         public object GetById(int id)
         {
             Connect conn = new Connect("library");
-            conn.Connnection.Open();
 
-            string sql = $"SELECT * FROM 'books' WHERE id = @id ";
+            conn.Connection.Open();
 
-            MySqlCommand cmd = new MySqlCommand(sql, conn.Connnection);
+            string sql = "SELECT * FROM `books` WHERE id = @id";
 
-            cmd.Parameters.AddWithValue("id", id);
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+
+            cmd.Parameters.AddWithValue("@id", id);
 
             MySqlDataReader dr = cmd.ExecuteReader();
 
-            dr .Read();
+            dr.Read();
 
             var record = new
             {
-                id = dr.GetInt32("id"),
-                title = dr.GetString("title"),
-                author = dr.GetString("author"),
-                releaseDate = dr.GetString("releaseDate")
+                id = dr.GetBodyDefinition(dr.GetName(0)),
+                title = dr.GetBodyDefinition(dr.GetName(1)),
+                author = dr.GetBodyDefinition(dr.GetName(2)),
+                releaseDate = dr.GetBodyDefinition(dr.GetName(3))
             };
 
-            conn.Connnection.Close();
+            conn.Connection.Close();
+
             return record;
         }
 
-        public object UpateIte(int modifiedItem)
+        public object UpdateIte(int id, object modifiedItem)
         {
-            throw new NotImplementedException();
+            Connect conn = new Connect("library");
+
+            conn.Connection.Open();
+
+            string sql = "UPDATE `books` SET `title`=@title,`author`=@author, `releaseDate`=@rdate WHERE `id`=@id";
+
+            var record = modifiedItem.GetType().GetProperties();
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+
+            cmd.Parameters.AddWithValue("@title", record[0].GetValue(modifiedItem));
+            cmd.Parameters.AddWithValue("@author", record[1].GetValue(modifiedItem));
+            cmd.Parameters.AddWithValue("@rdate", record[2].GetValue(modifiedItem));
+
+            cmd.Parameters.AddWithValue("@id", id);
+
+            cmd.ExecuteNonQuery();
+
+            conn.Connection.Close();
+
+            return new { message = "Sikeres módosítás." };
         }
     }
 }
