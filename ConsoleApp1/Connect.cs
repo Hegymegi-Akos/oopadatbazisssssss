@@ -1,15 +1,12 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OOP_DB
+namespace OOPAdatbazis
 {
     internal class Connect
     {
-        public MySqlConnection Connnection;
+        public MySqlConnection Connection;
+
         private string _host;
         private string _database;
         private string _user;
@@ -23,20 +20,26 @@ namespace OOP_DB
             _user = "root";
             _password = "";
 
-            _connectionString = $"SERVER={_host}; DATABASE={_database}; UID={_user}; PASSWORD={_password};SslMode=None";
+            _connectionString = $"SERVER={_host};DATABASE={_database};UID={_user};PASSWORD={_password};SslMode=None";
 
-            Connnection = new MySqlConnection(_connectionString);
+            Connection = new MySqlConnection(_connectionString);
+
             try
             {
-                Connnection.Open();
-                Console.WriteLine("Sikeres csatlakozás!");
-                Connnection.Close();
+                Connection.Open();
+                Console.WriteLine("Sikeres cstlakozás.");
+                Connection.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Sikertelen csatlakozás: {ex.Message}");
+                Console.WriteLine(ex.Message);
             }
+
         }
+
+
+
+
 
     }
 }
