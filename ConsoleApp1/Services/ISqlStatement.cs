@@ -1,14 +1,16 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ConsoleApp1.Services
+namespace OOPAdatbazis.Services
 {
-    internal interface ILibrary
+    internal interface ISqlStatements
     {
-        List<object> GetALlData(string dbName);
+        List<object> GetAllData(string dbName);
+        object GetById(int id);
 
+        object AddNewItem(object newRecord);
+
+        object DeleteItem(int id);
+
+        object UpdateIte(int id, object modifiedItem);
     }
 }
